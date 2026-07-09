@@ -60,14 +60,24 @@ export async function POST(req: Request) {
             quantity: z.number().describe('The number of items to order')
           }),
           // @ts-expect-error Vercel SDK generic inference bug
-          execute: async ({ productName, quantity }) => {
-            // Find product by name
-            const product = await prisma.product.findFirst({
-              where: { name: { contains: productName } } // basic search
-            });
+          execute: async (args: any) => {
+            const nameToSearch = args.productName || args.product_name || args.item || args.product || args.name;
+            const quantity = args.quantity || 1;
+            console.log('PLACE ORDER CALLED WITH:', args);
+            
+            if (!nameToSearch) {
+              return { error: `Product name is required to place an order.` };
+            }
+
+            // Fetch all products and do case-insensitive search in JS 
+            // (since Prisma SQLite contains is case-sensitive)
+            const allProducts = await prisma.product.findMany();
+            const product = allProducts.find(p => 
+              p.name.toLowerCase().includes(nameToSearch.toLowerCase())
+            );
             
             if (!product) {
-              return { error: `Product matching "${productName}" not found in inventory.` };
+              return { error: `Product matching "${nameToSearch}" not found in inventory.` };
             }
 
             // Create order
