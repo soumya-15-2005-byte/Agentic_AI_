@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { google } from '@ai-sdk/google';
-import { streamText, tool } from 'ai';
+import { streamText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 import prisma from '@/lib/db';
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     const result = await streamText({
       model: google('gemini-flash-lite-latest'),
-      maxSteps: 5,
+      stopWhen: isStepCount(5),
       system: `You are a helpful supply chain assistant for local Kirana store owners in Bharat. 
       You understand Hinglish and local terms. You act proactively to manage inventory. 
       You have tools to check inventory and place orders. 
