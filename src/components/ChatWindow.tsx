@@ -7,6 +7,7 @@ import { Send, Mic, MicOff } from 'lucide-react';
 
 export default function ChatWindow() {
   const { messages, status, error, sendMessage } = useChat({
+    maxSteps: 5,
     onError: (err: any) => {
       console.error('Chat error:', err);
     },
