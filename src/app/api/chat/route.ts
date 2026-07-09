@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     }
 
     const result = await streamText({
-      model: google('gemini-2.5-flash'),
+      model: google('gemini-flash-lite-latest'),
       system: `You are a helpful supply chain assistant for local Kirana store owners in Bharat. 
       You understand Hinglish and local terms. You act proactively to manage inventory. 
       You have tools to check inventory and place orders. 
