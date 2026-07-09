@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  current_stock Int
+  reorder_level Int
+  price         Float
+  orders        Order[]
+}
+
+model Order {
+  id         String   @id @default(uuid())
+  product_id String
+  quantity   Int
+  status     String   @default("pending") // "pending", "ordered", "delivered"
+  created_at DateTime @default(now())
+  product    Product  @relation(fields: [product_id], references: [id])
+}
+
+model ChatHistory {
+  id         String   @id @default(uuid())
+  role       String   // "user" or "assistant"
+  content    String
+  created_at DateTime @default(now())
+}
