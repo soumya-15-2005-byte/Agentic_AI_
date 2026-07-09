@@ -101,6 +101,46 @@ export async function POST(req: Request) {
             };
           },
         }),
+        sellProduct: tool({
+          description: 'Record a sale of a product and reduce its stock from inventory.',
+          parameters: z.object({
+            productName: z.string().describe('The exact name of the product sold'),
+            quantity: z.number().describe('The number of items sold')
+          }),
+          // @ts-expect-error Vercel SDK generic inference bug
+          execute: async (args: any) => {
+            const nameToSearch = args.productName || args.product_name || args.item || args.product || args.name;
+            const quantity = args.quantity || 1;
+            
+            if (!nameToSearch) {
+              return { error: `Product name is required to record a sale.` };
+            }
+
+            const allProducts = await prisma.product.findMany();
+            const product = allProducts.find(p => 
+              p.name.toLowerCase().includes(nameToSearch.toLowerCase())
+            );
+            
+            if (!product) {
+              return { error: `Product matching "${nameToSearch}" not found in inventory.` };
+            }
+
+            if (product.current_stock < quantity) {
+              return { error: `Not enough stock. Only ${product.current_stock}x ${product.name} left.` };
+            }
+
+            // Deduct stock
+            await prisma.product.update({
+              where: { id: product.id },
+              data: { current_stock: product.current_stock - quantity }
+            });
+
+            return { 
+              success: true, 
+              message: `Successfully recorded sale of ${quantity}x ${product.name}. Stock reduced.` 
+            };
+          },
+        }),
       },
     });
 
