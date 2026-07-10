@@ -47,11 +47,11 @@ export default function InventoryDashboard() {
             return (
               <div 
                 key={item.id} 
-                className={`p-4 rounded-lg border-l-4 shadow-sm bg-gray-50 ${isLow ? 'border-red-500' : 'border-green-500'}`}
+                className={`p-4 rounded-lg border-l-4 shadow-sm bg-gray-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 ${isLow ? 'border-red-500' : 'border-green-500'}`}
               >
                 <div className="flex justify-between items-start">
                   <h4 className="font-medium text-gray-800">{item.name}</h4>
-                  {isLow ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <CheckCircle className="w-4 h-4 text-green-500" />}
+                  {isLow ? <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" /> : <CheckCircle className="w-4 h-4 text-green-500" />}
                 </div>
                 <div className="mt-2 flex justify-between text-sm">
                   <span className="text-gray-500">Stock:</span>

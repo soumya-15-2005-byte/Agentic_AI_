@@ -121,11 +121,13 @@ export default function ChatWindow() {
           );
         })}
 
-        {/* Loading indicator when AI is streaming */}
-        {status === 'streaming' && (
+        {/* Loading indicator when AI is thinking/processing */}
+        {status === 'submitted' && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-500 rounded-lg rounded-tl-none px-4 py-2 shadow-sm">
-              <span className="animate-pulse text-sm">AI is typing...</span>
+            <div className="bg-white text-gray-500 rounded-lg rounded-tl-none px-4 py-3 shadow-sm flex gap-1 items-center">
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
             </div>
           </div>
         )}
