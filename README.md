@@ -2,7 +2,10 @@
 
 An intelligent, AI-powered supply chain and inventory management system built for the modern era. This project leverages the power of Large Language Models to autonomously manage inventory, process sales, and place procurement orders simply through natural language commands. 
 
+![Agentic Supply Chain Dashboard](public/dashboard-screenshot.png)
+
 This project perfectly aligns with the hackathon theme of bringing "Agentic AI" into real-world business operations, reducing manual data entry, and making supply chain management as easy as chatting with an assistant.
+
 
 ## Impactful Real-World Problem Solving 🌍
 In India, millions of micro-sellers, Kirana store owners, and small warehouse operators struggle with manual inventory tracking. This project changes their lives by completely removing the need for complex ERP software or manual data entry.
@@ -10,7 +13,7 @@ By providing a simple, WhatsApp-like chat interface, a seller can simply type or
 
 ## Features ✨
 - **Multilingual Conversational AI (Bonus Tip):** Designed specifically for Bharat. The AI understands Hindi, Hinglish, and English seamlessly. You can instruct the agent in your local language and get responses back in the same language.
-- **Autonomous Tool Calling:** The AI autonomously triggers backend tools to update databases without human intervention based on intent.
+- **Autonomous AI Decision Making:** Unlike traditional chatbots, our AI doesn't just reply with text. We have integrated **Vercel AI SDK's tool calling feature** which gives the Gemini model direct access to backend Node.js functions. When a user asks to restock, the AI autonomously decides which tool to call (`placeOrder` or `sellProduct`), extracts the correct parameters (product name, quantity) from the unstructured Hinglish text, and executes the database update directly!
 - **Real-Time Dashboard:** A dynamic, visually appealing dashboard that shows live inventory and procurement history.
 - **Low Stock Alerts:** Automatic visual indicators and animations on the dashboard when items fall below their reorder levels.
 - **Auto-Sync:** Seamless integration between the AI chat and the store database.
@@ -78,7 +81,7 @@ To run this project locally on your machine, follow these steps:
 [https://github.com/soumya-15-2005-byte/Agentic_AI_](https://github.com/soumya-15-2005-byte/Agentic_AI_)
 
 ## Contact 📧
-**Email:** your-email@example.com
+**Email:** soumya-15-2005-byte@github.com
 *(Please feel free to reach out if you have any questions regarding the implementation or the AI logic!)*
 
 ## Future Work 🔮
