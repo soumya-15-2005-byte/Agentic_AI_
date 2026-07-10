@@ -78,7 +78,7 @@ To run this project locally on your machine, follow these steps:
 [https://github.com/soumya-15-2005-byte/Agentic_AI_](https://github.com/soumya-15-2005-byte/Agentic_AI_)
 
 ## Contact 📧
-**Email:** your-email@example.com
+**Email:** soumyagupta.985@gmail.com
 *(Please feel free to reach out if you have any questions regarding the implementation or the AI logic!)*
 
 ## Future Work 🔮
