@@ -72,7 +72,14 @@ export default function ChatWindow() {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel(); // Stop any ongoing speech
       const utterance = new SpeechSynthesisUtterance(text);
-      // utterance.lang removed so the browser uses the best available voice for the text script
+      
+      // Smart detection: Agar text mein Hindi (Devanagari) characters hain, toh 'hi-IN', warna 'en-IN' (Hinglish/English ke liye)
+      if (/[\u0900-\u097F]/.test(text)) {
+         utterance.lang = 'hi-IN';
+      } else {
+         utterance.lang = 'en-IN';
+      }
+      
       utterance.rate = 1.0;
       window.speechSynthesis.speak(utterance);
     } else {
