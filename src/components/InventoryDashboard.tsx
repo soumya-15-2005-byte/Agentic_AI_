@@ -127,7 +127,7 @@ export default function InventoryDashboard() {
               <p className="text-sm text-indigo-800"><span className="font-semibold text-indigo-900">Demand:</span> ↑ Surge Expected</p>
               <p className="text-sm text-indigo-800"><span className="font-semibold text-indigo-900">Confidence:</span> 91%</p>
               <div className="mt-3 p-3 bg-white/60 rounded-lg text-xs text-indigo-900 leading-relaxed font-medium">
-                "Weekend spike approaching. I compared 3 local suppliers and found the lowest rate for low-stock items. Requesting order approval to prevent stockout."
+                &quot;Weekend spike approaching. I compared 3 local suppliers and found the lowest rate for low-stock items. Requesting order approval to prevent stockout.&quot;
               </div>
             </div>
           </div>
