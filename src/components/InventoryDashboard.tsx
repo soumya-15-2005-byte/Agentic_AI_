@@ -35,12 +35,17 @@ export default function InventoryDashboard() {
     return <div className="text-gray-500 animate-pulse">Loading dashboard...</div>;
   }
 
-  // Dummy Demand Forecast Data
-  const forecastData = inventory.map(item => ({
-    name: item.name,
-    stock: item.current_stock,
-    predicted_demand: item.current_stock + Math.floor(Math.random() * 20) + 5
-  }));
+  // Dummy Demand Forecast Data (Stable values to prevent chart fluctuation)
+  const forecastData = inventory.map(item => {
+    // Generate a stable "random" number based on the product name's length
+    // so the chart doesn't jump every 3 seconds.
+    const stableRandom = (item.name.length * 3) % 20; 
+    return {
+      name: item.name,
+      stock: item.current_stock,
+      predicted_demand: item.current_stock + stableRandom + 5
+    };
+  });
 
   return (
     <div className="space-y-8">

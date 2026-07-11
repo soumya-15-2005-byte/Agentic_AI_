@@ -153,13 +153,16 @@ export async function POST(req: Request) {
           // @ts-expect-error Vercel SDK generic inference bug
           execute: async (_args) => {
             const products = await prisma.product.findMany();
-            // Generate dummy predictions based on current stock
-            const predictions = products.map(p => ({
-              product: p.name,
-              currentStock: p.current_stock,
-              forecastedDemand: p.current_stock + Math.floor(Math.random() * 20) + 5,
-              recommendation: p.current_stock <= p.reorder_level ? 'HIGH_PRIORITY_ORDER' : 'NO_ORDER_NEEDED'
-            })).filter(p => p.recommendation === 'HIGH_PRIORITY_ORDER');
+            // Generate stable predictions based on current stock and name length
+            const predictions = products.map(p => {
+              const stableRandom = (p.name.length * 3) % 20;
+              return {
+                product: p.name,
+                currentStock: p.current_stock,
+                forecastedDemand: p.current_stock + stableRandom + 5,
+                recommendation: p.current_stock <= p.reorder_level ? 'HIGH_PRIORITY_ORDER' : 'NO_ORDER_NEEDED'
+              };
+            }).filter(p => p.recommendation === 'HIGH_PRIORITY_ORDER');
             
             return {
               analysis: "Based on 30-day moving average and festival seasonality, here are the predicted demands.",
