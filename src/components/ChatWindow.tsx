@@ -42,7 +42,7 @@ export default function ChatWindow() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
-      recognition.lang = 'en-IN';
+      // recognition.lang removed to allow browser auto-detection based on system/browser settings
       recognition.continuous = false;
       
       recognition.onstart = () => setIsListening(true);
@@ -72,7 +72,7 @@ export default function ChatWindow() {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel(); // Stop any ongoing speech
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'hi-IN'; // Defaulting to Hindi for Bharat focus
+      // utterance.lang removed so the browser uses the best available voice for the text script
       utterance.rate = 1.0;
       window.speechSynthesis.speak(utterance);
     } else {
