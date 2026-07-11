@@ -40,10 +40,7 @@ export async function POST(req: Request) {
       system: `You are a helpful supply chain assistant for local Kirana store owners in Bharat. 
       You are highly proficient in MULTILINGUAL communication. Always understand and respond in the EXACT language the user is speaking, whether it is Hindi, Hinglish, English, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, or any other Indian regional language.
       You act proactively to manage inventory. You have tools to check inventory, place orders, record sales, predict demand, and recommend suppliers. 
-      When a user asks "Kal kya order karna chahiye?" or asks for restock recommendations:
-      1. Use the predictDemand tool to find what needs to be ordered.
-      2. Use the recommendSupplier tool to find the best supplier for those items.
-      3. Tell the user your recommendation and ask them to confirm before using placeOrder.
+      When a user asks "Kal kya order karna chahiye?" or asks for restock recommendations, YOU MUST call the 'predictDemand' tool. It will return what needs to be ordered along with the best supplier. Then, tell the user the demand and the best supplier (e.g. "Tata Salt is low. Udaan Wholesale has it for ₹40. Should I place an order?").
       Keep responses concise, conversational, and friendly (like a WhatsApp chat). 
       CRITICAL RULE: NEVER tell the user an order is placed or a sale is recorded unless you have SUCCESSFULLY called the 'placeOrder' or 'sellProduct' tool. You MUST call the tool to change the database. Do not just output text saying it is done.
       If a user asks to sell or order an item that doesn't exist, politely inform them about the error instead of hallucinating.
@@ -148,24 +145,40 @@ export async function POST(req: Request) {
           },
         }),
         predictDemand: tool({
-          description: 'Analyze mock sales history to predict what needs to be ordered tomorrow.',
+          description: 'Analyze mock sales history to predict what needs to be ordered tomorrow, and automatically find the best supplier for those items.',
           parameters: z.object({ dummy: z.boolean().optional() }),
           // @ts-expect-error Vercel SDK generic inference bug
           execute: async (_args) => {
+            console.log('PREDICT DEMAND TOOL CALLED');
             const products = await prisma.product.findMany();
             // Generate stable predictions based on current stock and name length
             const predictions = products.map(p => {
               const stableRandom = (p.name.length * 3) % 20;
+              const isLow = p.current_stock <= p.reorder_level;
+              
+              let bestSupplier = null;
+              if (isLow) {
+                 const suppliers = [
+                   { name: "Udaan Wholesale", price: Math.floor(Math.random() * 10) + 40, delivery: "Tomorrow Morning", rating: 4.8 },
+                   { name: "Local Mandi Vendor", price: Math.floor(Math.random() * 10) + 38, delivery: "Today Evening", rating: 4.1 },
+                   { name: "JioMart B2B", price: Math.floor(Math.random() * 10) + 45, delivery: "In 2 days", rating: 4.5 }
+                 ];
+                 suppliers.sort((a, b) => a.price - b.price);
+                 bestSupplier = suppliers[0];
+              }
+              
               return {
                 product: p.name,
                 currentStock: p.current_stock,
                 forecastedDemand: p.current_stock + stableRandom + 5,
-                recommendation: p.current_stock <= p.reorder_level ? 'HIGH_PRIORITY_ORDER' : 'NO_ORDER_NEEDED'
+                recommendation: isLow ? 'HIGH_PRIORITY_ORDER' : 'NO_ORDER_NEEDED',
+                bestSupplier: bestSupplier
               };
             }).filter(p => p.recommendation === 'HIGH_PRIORITY_ORDER');
             
+            console.log('PREDICT DEMAND RESULTS:', predictions);
             return {
-              analysis: "Based on 30-day moving average and festival seasonality, here are the predicted demands.",
+              analysis: "Based on 30-day moving average and festival seasonality, here are the predicted demands and the best recommended suppliers.",
               itemsToOrder: predictions
             };
           },
@@ -177,6 +190,7 @@ export async function POST(req: Request) {
           }),
           // @ts-expect-error Vercel SDK generic inference bug
           execute: async (args: any) => {
+            console.log('RECOMMEND SUPPLIER TOOL CALLED WITH:', args);
             const suppliers = [
               { name: "Udaan Wholesale", price: Math.floor(Math.random() * 10) + 40, delivery: "Tomorrow Morning", rating: 4.8 },
               { name: "Local Mandi Vendor", price: Math.floor(Math.random() * 10) + 38, delivery: "Today Evening", rating: 4.1 },
