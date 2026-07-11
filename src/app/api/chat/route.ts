@@ -197,8 +197,8 @@ export async function POST(req: Request) {
     });
 
     // Return the correct stream format for the latest AI SDK
-    // @ts-expect-error Vercel SDK version mismatch handling
-    return (result as any).toUIMessageStreamResponse ? (result as any).toUIMessageStreamResponse() : result.toDataStreamResponse ? result.toDataStreamResponse() : (result as any).toTextStreamResponse();
+    // @ts-expect-error Vercel SDK generic inference bug
+    return result.toDataStreamResponse ? result.toDataStreamResponse() : (result as any).toTextStreamResponse();
   } catch (error: any) {
     console.error('Chat API Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'AI request failed' }), {

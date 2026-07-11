@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Send, Mic, MicOff, Volume2 } from 'lucide-react';
 
 export default function ChatWindow() {
-  const { messages, status, error, sendMessage } = useChat({
+  const { messages, status, error, append } = useChat({
     onError: (err: any) => {
       console.error('Chat error:', err);
     },
@@ -23,8 +23,7 @@ export default function ChatWindow() {
     e.preventDefault();
     if (!input || !input.trim()) return;
     
-    // sendMessage in ai-sdk v4+ expects { text: string } format
-    sendMessage({ text: input });
+    append({ role: 'user', content: input });
     setInput('');
   };
 
