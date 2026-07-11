@@ -92,11 +92,15 @@ To run this project locally on your machine, follow these steps:
 **Email:** soumya-15-2005-byte@github.com
 *(Please feel free to reach out if you have any questions regarding the implementation or the AI logic!)*
 
-## Future Work 🔮
+## Future Work / Grand Vision 🔮
+This platform is designed to be a full-fledged **Agentic AI platform for Kirana sellers** that solves real-world logistics and supply chain problems (akin to challenges faced by platforms like Meesho):
+- **Predict Demand:** Analyze past sales data to proactively alert shopkeepers about upcoming high-demand seasons or festivals.
+- **Negotiate with Suppliers:** An autonomous agent that can email or text local suppliers to find the best wholesale rates.
+- **Optimize Delivery:** Route planning and delivery estimation tools integrated directly into the chat interface.
+- **Direct WhatsApp API:** Taking the chat interface directly into the seller's actual WhatsApp account, completely eliminating the need for a web dashboard.
 - **Multi-Agent System:** Introducing separate specialized agents (e.g., a Sales Agent and a Warehouse Agent) that communicate with each other.
-- **Cloud Database:** Migrating from SQLite to PostgreSQL (Supabase) for better scalability across serverless environments.
-- **Authentication:** Adding NextAuth for secure access to the dashboard.
 
 ---
 ### 💡 Why This Wins The Hackathon
-**Agentic Supply Chain** directly addresses the hackathon's theme of pushing AI beyond just "chatting" and into "doing". By combining autonomous agentic workflows, a Bharat-first multilingual approach, and a consumer-friendly UI, this solution proves that enterprise-grade automation can be made accessible to the smallest micro-sellers in India. **This isn't just a prototype; it's the future of retail management in Bharat.**
+**Agentic Supply Chain** directly addresses the hackathon's theme of pushing AI beyond just "chatting" and into "doing". By combining autonomous agentic workflows (Auto-ordering, real-time database mutations), a Bharat-first Multilingual Voice/Text approach, and a consumer-friendly UI, this solution proves that enterprise-grade automation can be made accessible to the smallest micro-sellers in India. 
+**This isn't just a prototype for a college hackathon; it solves a real Meesho-scale problem and is the future of retail management in Bharat.**
