@@ -3,7 +3,7 @@
 
 import { useChat } from '@ai-sdk/react';
 import { useState, useEffect, useRef } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
+import { Send, Mic, MicOff, Volume2 } from 'lucide-react';
 
 export default function ChatWindow() {
   const { messages, status, error, sendMessage } = useChat({
@@ -68,6 +68,18 @@ export default function ChatWindow() {
     return '';
   };
 
+  const speakText = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Stop any ongoing speech
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'hi-IN'; // Defaulting to Hindi for Bharat focus
+      utterance.rate = 1.0;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("Text-to-Speech is not supported in your browser.");
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-[#efeae2]">
       {/* Chat Messages Area */}
@@ -92,7 +104,18 @@ export default function ChatWindow() {
                 }`}
               >
                 {text && (
-                  <p className="text-[15px] whitespace-pre-wrap">{text}</p>
+                  <div className="group relative">
+                    <p className="text-[15px] whitespace-pre-wrap">{text}</p>
+                    {m.role === 'assistant' && (
+                      <button 
+                        onClick={() => speakText(text)}
+                        className="absolute -right-10 top-0 p-2 text-gray-400 hover:text-green-600 transition-colors"
+                        title="Listen to message"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 )}
                 
                 {/* Tool invocations from parts */}
