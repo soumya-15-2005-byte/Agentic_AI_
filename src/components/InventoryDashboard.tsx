@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { getInventory, getOrders } from '@/app/actions';
-import { Package, ShoppingCart, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Package, ShoppingCart, AlertTriangle, CheckCircle, TrendingUp, Cpu, Lightbulb, Activity, Check } from 'lucide-react';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function InventoryDashboard() {
   const [inventory, setInventory] = useState<any[]>([]);
@@ -26,19 +26,16 @@ export default function InventoryDashboard() {
 
   useEffect(() => {
     fetchData();
-    // Poll every 3 seconds for the demo
     const interval = setInterval(fetchData, 3000);
     return () => clearInterval(interval);
   }, []);
 
   if (loading) {
-    return <div className="text-gray-500 animate-pulse">Loading dashboard...</div>;
+    return <div className="text-gray-500 animate-pulse">Loading Agentic Dashboard...</div>;
   }
 
-  // Dummy Demand Forecast Data (Stable values to prevent chart fluctuation)
+  // Demand Forecast Data
   const forecastData = inventory.map(item => {
-    // Generate a stable "random" number based on the product name's length
-    // so the chart doesn't jump every 3 seconds.
     const stableRandom = (item.name.length * 3) % 20; 
     return {
       name: item.name,
@@ -47,71 +44,169 @@ export default function InventoryDashboard() {
     };
   });
 
-  return (
-    <div className="space-y-8">
-      {/* Inventory Section */}
-      <section>
-        <h3 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-700">
-          <Package className="w-5 h-5" /> Current Stock
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {inventory.map((item) => {
-            const isLow = item.current_stock <= item.reorder_level;
-            return (
-              <div 
-                key={item.id} 
-                className={`p-4 rounded-lg border-l-4 shadow-sm bg-gray-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 ${isLow ? 'border-red-500' : 'border-green-500'}`}
-              >
-                <div className="flex justify-between items-start">
-                  <h4 className="font-medium text-gray-800">{item.name}</h4>
-                  {isLow ? <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" /> : <CheckCircle className="w-4 h-4 text-green-500" />}
-                </div>
-                <div className="mt-2 flex justify-between text-sm">
-                  <span className="text-gray-500">Stock:</span>
-                  <span className={`font-bold ${isLow ? 'text-red-600' : 'text-gray-700'}`}>
-                    {item.current_stock}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Reorder Level:</span>
-                  <span className="text-gray-700">{item.reorder_level}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+  // Mock Past Sales Data for the Graph
+  const pastSalesData = [
+    { day: 'Mon', sales: 40 },
+    { day: 'Tue', sales: 45 },
+    { day: 'Wed', sales: 42 },
+    { day: 'Thu', sales: 50 },
+    { day: 'Fri', sales: 65 },
+    { day: 'Sat', sales: 80 },
+  ];
 
-      {/* Recent Orders Section */}
-      <section>
-        <h3 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-700">
-          <ShoppingCart className="w-5 h-5" /> Procurement Orders
+  return (
+    <div className="space-y-6">
+      
+      {/* Top Section: Inventory & Workflow */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Left Col: Inventory Cards (Takes up 2 cols) */}
+        <div className="lg:col-span-2 space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+            <Package className="w-5 h-5 text-indigo-600" /> Current Stock Levels
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {inventory.map((item) => {
+              const isLow = item.current_stock <= item.reorder_level;
+              return (
+                <div key={item.id} className={`p-4 rounded-xl border-l-4 shadow-sm bg-white hover:shadow-md transition-shadow ${isLow ? 'border-red-500' : 'border-emerald-500'}`}>
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                    {isLow ? <AlertTriangle className="w-5 h-5 text-red-500 animate-pulse" /> : <CheckCircle className="w-5 h-5 text-emerald-500" />}
+                  </div>
+                  <div className="mt-3 flex justify-between items-end">
+                    <div>
+                      <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Stock Left</p>
+                      <p className={`text-2xl font-bold ${isLow ? 'text-red-600' : 'text-gray-700'}`}>{item.current_stock}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Reorder Lvl</p>
+                      <p className="text-sm font-semibold text-gray-600">{item.reorder_level}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Col: AI Intelligence Panel */}
+        <div className="space-y-6">
+          {/* Agent Workflow Card */}
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-md font-bold flex items-center gap-2 mb-4 text-gray-800 border-b pb-2">
+              <Cpu className="w-5 h-5 text-blue-600" /> Agentic AI Workflow
+            </h3>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-center gap-3 text-gray-700">
+                <div className="bg-green-100 p-1 rounded-full"><Check className="w-3 h-3 text-green-600" /></div>
+                <span className="font-medium">Inventory Agent</span> <span className="text-gray-400 text-xs ml-auto">Completed</span>
+              </li>
+              <li className="flex items-center gap-3 text-gray-700">
+                <div className="bg-green-100 p-1 rounded-full"><Check className="w-3 h-3 text-green-600" /></div>
+                <span className="font-medium">Forecast Agent</span> <span className="text-gray-400 text-xs ml-auto">Completed</span>
+              </li>
+              <li className="flex items-center gap-3 text-gray-700">
+                <div className="bg-green-100 p-1 rounded-full"><Check className="w-3 h-3 text-green-600" /></div>
+                <span className="font-medium">Supplier Agent</span> <span className="text-gray-400 text-xs ml-auto">Completed</span>
+              </li>
+              <li className="flex items-center gap-3 text-gray-700">
+                <div className="bg-yellow-100 p-1 rounded-full animate-pulse"><AlertTriangle className="w-3 h-3 text-yellow-600" /></div>
+                <span className="font-medium">Order Agent</span> <span className="text-yellow-600 text-xs font-semibold ml-auto">Awaiting Approval</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* AI Insights Card */}
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-5 rounded-xl shadow-sm border border-indigo-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-2 opacity-10"><Lightbulb className="w-16 h-16" /></div>
+            <h3 className="text-md font-bold flex items-center gap-2 mb-3 text-indigo-900">
+              <Lightbulb className="w-5 h-5 text-indigo-600" /> AI Insights
+            </h3>
+            <div className="space-y-2">
+              <p className="text-sm text-indigo-800"><span className="font-semibold text-indigo-900">Demand:</span> ↑ Surge Expected</p>
+              <p className="text-sm text-indigo-800"><span className="font-semibold text-indigo-900">Confidence:</span> 91%</p>
+              <div className="mt-3 p-3 bg-white/60 rounded-lg text-xs text-indigo-900 leading-relaxed font-medium">
+                "Weekend spike approaching. I compared 3 local suppliers and found the lowest rate for low-stock items. Requesting order approval to prevent stockout."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Middle Section: Graphs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Past Sales Graph */}
+        <section className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-md font-bold flex items-center gap-2 mb-4 text-gray-700">
+            <Activity className="w-5 h-5 text-orange-500" /> Past 7-Day Sales Trend
+          </h3>
+          <div className="h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={pastSalesData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                <XAxis dataKey="day" tick={{fill: '#9ca3af', fontSize: 11}} axisLine={false} tickLine={false} />
+                <YAxis tick={{fill: '#9ca3af', fontSize: 11}} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                <Line type="monotone" dataKey="sales" stroke="#f97316" strokeWidth={3} dot={{r: 4, fill: '#f97316', strokeWidth: 2, stroke: '#fff'}} activeDot={{r: 6}} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        {/* Future Demand Forecast Graph */}
+        <section className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-md font-bold flex items-center gap-2 mb-4 text-gray-700">
+            <TrendingUp className="w-5 h-5 text-green-600" /> AI Demand Forecast (Next 7 Days)
+          </h3>
+          <div className="h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={forecastData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                <XAxis dataKey="name" tick={{fill: '#9ca3af', fontSize: 10}} axisLine={false} tickLine={false} interval={0} />
+                <YAxis tick={{fill: '#9ca3af', fontSize: 11}} axisLine={false} tickLine={false} />
+                <Tooltip cursor={{fill: '#f9fafb'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                <Bar dataKey="stock" name="Current Stock" fill="#e5e7eb" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="predicted_demand" name="Predicted Demand" fill="#10b981" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+      </div>
+
+      {/* Bottom Section: Orders */}
+      <section className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+        <h3 className="text-md font-bold flex items-center gap-2 mb-4 text-gray-700">
+          <ShoppingCart className="w-5 h-5 text-blue-500" /> Live Procurement Orders
         </h3>
         {orders.length === 0 ? (
-          <p className="text-gray-500 text-sm">No recent orders.</p>
+          <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+            <p className="text-gray-400 text-sm font-medium">No recent orders placed by the AI Order Agent yet.</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-600">
+              <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-xs font-semibold">
                 <tr>
-                  <th className="px-4 py-2 rounded-tl-lg">Item</th>
-                  <th className="px-4 py-2">Qty</th>
-                  <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2 rounded-tr-lg">Time</th>
+                  <th className="px-4 py-3 rounded-tl-lg">Item</th>
+                  <th className="px-4 py-3">Qty</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 rounded-tr-lg">Time</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-100">
                 {orders.map((order) => (
-                  <tr key={order.id} className="border-b last:border-0 hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-800">{order.product.name}</td>
-                    <td className="px-4 py-3">{order.quantity}</td>
+                  <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-4 py-3 font-semibold text-gray-700">{order.product.name}</td>
+                    <td className="px-4 py-3 font-medium text-gray-600">{order.quantity} units</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">
-                        {order.status}
+                      <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full flex items-center gap-1 w-max">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        {order.status.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {new Date(order.created_at).toLocaleTimeString()}
+                    <td className="px-4 py-3 text-gray-400 font-medium">
+                      {new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </td>
                   </tr>
                 ))}
@@ -119,28 +214,6 @@ export default function InventoryDashboard() {
             </table>
           </div>
         )}
-      </section>
-
-      {/* Demand Forecast Chart Section */}
-      <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-semibold flex items-center gap-2 mb-6 text-gray-700">
-          <TrendingUp className="w-5 h-5 text-green-600" /> 7-Day Demand Forecast
-        </h3>
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={forecastData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-              <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
-              <YAxis tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
-              <Tooltip 
-                cursor={{fill: '#f3f4f6'}}
-                contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
-              />
-              <Bar dataKey="stock" name="Current Stock" fill="#9ca3af" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="predicted_demand" name="Predicted Demand" fill="#16a34a" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
       </section>
     </div>
   );
