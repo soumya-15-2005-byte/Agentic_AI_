@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { getInventory, getOrders } from '@/app/actions';
-import { Package, ShoppingCart, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Package, ShoppingCart, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function InventoryDashboard() {
   const [inventory, setInventory] = useState<any[]>([]);
@@ -33,6 +34,13 @@ export default function InventoryDashboard() {
   if (loading) {
     return <div className="text-gray-500 animate-pulse">Loading dashboard...</div>;
   }
+
+  // Dummy Demand Forecast Data
+  const forecastData = inventory.map(item => ({
+    name: item.name,
+    stock: item.current_stock,
+    predicted_demand: item.current_stock + Math.floor(Math.random() * 20) + 5
+  }));
 
   return (
     <div className="space-y-8">
@@ -106,6 +114,28 @@ export default function InventoryDashboard() {
             </table>
           </div>
         )}
+      </section>
+
+      {/* Demand Forecast Chart Section */}
+      <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <h3 className="text-lg font-semibold flex items-center gap-2 mb-6 text-gray-700">
+          <TrendingUp className="w-5 h-5 text-green-600" /> 7-Day Demand Forecast
+        </h3>
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={forecastData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+              <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
+              <YAxis tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
+              <Tooltip 
+                cursor={{fill: '#f3f4f6'}}
+                contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+              />
+              <Bar dataKey="stock" name="Current Stock" fill="#9ca3af" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="predicted_demand" name="Predicted Demand" fill="#16a34a" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </section>
     </div>
   );

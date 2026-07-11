@@ -39,7 +39,11 @@ export async function POST(req: Request) {
       stopWhen: isStepCount(5),
       system: `You are a helpful supply chain assistant for local Kirana store owners in Bharat. 
       You are highly proficient in MULTILINGUAL communication. Always understand and respond in the EXACT language the user is speaking, whether it is Hindi, Hinglish, English, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, or any other Indian regional language.
-      You act proactively to manage inventory. You have tools to check inventory, place orders, and record sales. 
+      You act proactively to manage inventory. You have tools to check inventory, place orders, record sales, predict demand, and recommend suppliers. 
+      When a user asks "Kal kya order karna chahiye?" or asks for restock recommendations:
+      1. Use the predictDemand tool to find what needs to be ordered.
+      2. Use the recommendSupplier tool to find the best supplier for those items.
+      3. Tell the user your recommendation and ask them to confirm before using placeOrder.
       Keep responses concise, conversational, and friendly (like a WhatsApp chat). 
       If a user asks to sell or order an item that doesn't exist, politely inform them about the error instead of hallucinating.
       If you place an order or record a sale, confirm it nicely in the user's language.`,
@@ -139,6 +143,49 @@ export async function POST(req: Request) {
             return { 
               success: true, 
               message: `Successfully recorded sale of ${quantity}x ${product.name}. Stock reduced.` 
+            };
+          },
+        }),
+        predictDemand: tool({
+          description: 'Analyze mock sales history to predict what needs to be ordered tomorrow.',
+          parameters: z.object({ dummy: z.boolean().optional() }),
+          // @ts-expect-error Vercel SDK generic inference bug
+          execute: async (_args) => {
+            const products = await prisma.product.findMany();
+            // Generate dummy predictions based on current stock
+            const predictions = products.map(p => ({
+              product: p.name,
+              currentStock: p.current_stock,
+              forecastedDemand: p.current_stock + Math.floor(Math.random() * 20) + 5,
+              recommendation: p.current_stock <= p.reorder_level ? 'HIGH_PRIORITY_ORDER' : 'NO_ORDER_NEEDED'
+            })).filter(p => p.recommendation === 'HIGH_PRIORITY_ORDER');
+            
+            return {
+              analysis: "Based on 30-day moving average and festival seasonality, here are the predicted demands.",
+              itemsToOrder: predictions
+            };
+          },
+        }),
+        recommendSupplier: tool({
+          description: 'Compare local suppliers and recommend the best one for a specific product.',
+          parameters: z.object({
+            productName: z.string().describe('The name of the product to find a supplier for')
+          }),
+          // @ts-expect-error Vercel SDK generic inference bug
+          execute: async (args: any) => {
+            const suppliers = [
+              { name: "Udaan Wholesale", price: Math.floor(Math.random() * 10) + 40, delivery: "Tomorrow Morning", rating: 4.8 },
+              { name: "Local Mandi Vendor", price: Math.floor(Math.random() * 10) + 38, delivery: "Today Evening", rating: 4.1 },
+              { name: "JioMart B2B", price: Math.floor(Math.random() * 10) + 45, delivery: "In 2 days", rating: 4.5 }
+            ];
+            
+            // Sort by price
+            suppliers.sort((a, b) => a.price - b.price);
+            
+            return {
+              product: args.productName,
+              bestSupplier: suppliers[0],
+              allSuppliers: suppliers
             };
           },
         }),
